@@ -22,12 +22,16 @@ class Module:
     def train(self):
         "Set the mode of this module and all descendent modules to `train`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        for module in self.modules():
+            module.train()
+        self.training = True
 
     def eval(self):
         "Set the mode of this module and all descendent modules to `eval`."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        for module in self.modules():
+            module.eval()
+        self.training = False
 
     def named_parameters(self):
         """
@@ -38,12 +42,23 @@ class Module:
             list of pairs: Contains the name and :class:`Parameter` of each ancestor parameter.
         """
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        param_list = [(k,v) for k, v in self._parameters.items()]
+        for module_name, module in self._modules.items():
+            descendant_params = module.named_parameters()
+            for i in range(len(descendant_params)):
+                descendant_params[i] = (module_name + "." + descendant_params[i][0], descendant_params[i][1])
+            param_list.extend(descendant_params)
+        return param_list
 
     def parameters(self):
         "Enumerate over all the parameters of this module and its descendents."
         # TODO: Implement for Task 0.4.
-        raise NotImplementedError("Need to implement for Task 0.4")
+        print("All attrs : {}".format(self.__dict__.keys()))
+        non_params = [attr for attr in self.__dict__.keys() if not callable(getattr(self, attr)) and not attr.startswith("__") and not attr.__eq__("training") and not (attr.startswith("_modules") or attr.startswith("_parameters"))]
+        params = self.named_parameters()
+        print("non_params : {}".format(non_params))
+        print("params : {}".format(params))
+        return params
 
     def add_parameter(self, k, v):
         """
